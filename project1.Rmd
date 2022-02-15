@@ -1,0 +1,14 @@
+---
+title: "TMA4250 Spatial Statistics: Project 1"
+author: "Group 3: Lars Evje, Martin Tufte"
+date: "1/29/2022"
+output: pdf_document
+fig_width: 3
+fig_height: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 5, fig.height = 4, fig.align = "center")
+set.seed(4250)
+```
+
