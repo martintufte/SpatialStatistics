@@ -1,5 +1,5 @@
 ---
-title: "TMA4250 Spatial Statistics: Project 1"
+title: "TMA4250 Spatial Statistics: Exercise 1"
 author: "Group 3: Lars Evje, Martin Tufte"
 date: "1/29/2022"
 output: pdf_document
@@ -11,4 +11,27 @@ fig_height: 4
 knitr::opts_chunk$set(echo = TRUE, fig.width = 5, fig.height = 4, fig.align = "center")
 set.seed(4250)
 ```
+
+# Problem 1: GRFs – model characteristics
+
+## a)
+
+Example of code block. \textcolor{blue}{Dette er en kommentar.}
+
+```{r test, fig.cap="This is the test caption."}
+x <- rnorm(1000)
+hist(x)
+```
+From figure 1, we see that the histogram resembles the standard normal distribution.
+
+\newpage
+# Problem 2: GRF - real data
+
+
+\newpage
+# Problem 3: Parameter estimation
+
+
+
+
 
