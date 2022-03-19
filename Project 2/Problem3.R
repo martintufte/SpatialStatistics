@@ -6,7 +6,8 @@ library(ggplot2)
 library(tidyverse)
 library(dplyr)
 library(class)
-library(factoextra)
+
+
 ##### Problem 3
 
 
@@ -14,16 +15,8 @@ library(factoextra)
 
 redwood <- read.table("data/redwood.dat", col.names = c("x", "y"))
 
-# try clustering
-#redwood.kmeans <- kmeans(redwood, 5)
-#redwood$cluster <- redwood.kmeans$cluster
-#redwood.cluster <- ggplot(redwood, aes(x=x, y=y)) +
-#  geom_point(aes(colour=cluster), size=0.5) + coord_fixed(xlim=c(0, 1), ylim=c(0, 1)) +
-#  labs(x=expression(x), y=expression(y)) + theme_bw() + scale_colour_manual(labels=redwood$cluster)
-#redwood.cluster
 
-
-# Neymann-Scott simulation
+## Neymann-Scott simulation
 sim.parent <- function(lambda, add.dist = 0.25) {
   # update region to include additional areas around the domain
   ppregion(xl=-add.dist, xu=1+add.dist, yl=-add.dist, yu=1+add.dist)
@@ -195,7 +188,4 @@ ggsave("figures/redwood_sim1.pdf", plot = redwood.sim1, width = 3.0, height = 3.
 ggsave("figures/redwood_sim2.pdf", plot = redwood.sim2, width = 3.0, height = 3.0)
 ggsave("figures/redwood_sim3.pdf", plot = redwood.sim3, width = 3.0, height = 3.0)
 
-       
-       
-       
        
