@@ -7,6 +7,9 @@ library(tidyverse)
 library(dplyr)
 
 
+##### Problem 1
+
+
 ### (a)
 
 ## Read data
@@ -73,7 +76,7 @@ sim.L <- function(n, data, fs=0.5, k=100) {
   count <- nrow(data)
   simulations <- matrix(0, nrow=n, ncol=k)
   for (i in 1:n) {
-    simulations[i, ] <- Kfn(pp=Psim(count), fs, k)$y
+    simulations[i, ] <- Kfn(pp=Psim(rpois(1,count)), fs, k)$y
   }
   simulations
 }
