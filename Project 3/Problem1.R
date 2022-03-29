@@ -13,6 +13,8 @@ library(ggplot2)
 library(rgdal)
 library(spData)
 library(spdep)
+source('functions.R')
+
 
 # seed
 set.seed(4250)
@@ -27,5 +29,7 @@ load("data/Admin1Geography.RData")
 load("data/Admin2Geography.RData")
 # --> contains an object nigeriaAdm2 that contains the borders of the 775 admin2 areas
 
-
+# read the border graphs (note that a space " " was added in the beginning of each file)
+table1 <- read.table("data/Admin1Graph.txt", header=TRUE, sep=" ")
+table2 <- read.table("data/Admin2Graph.txt", header=TRUE, sep=" ")
 
