@@ -36,13 +36,16 @@ plotAreaCol = function(fName, width, height, estVal, geoMap, leg, colLim = NULL)
                          end = 0,
                          limit = colLim,
                          name = leg) + 
-    coord_fixed() + 
-    theme(text = element_text(size=40),
-          legend.key.height = unit(4, 'cm'),
-          legend.key.width  = unit(1.75, 'cm'))
+    coord_fixed() 
   ggsave(filename = fName,
          plot = map,
          width = width, 
          height = height)
 }
+
+# I removed this as it gave me some troubles having to set a ridiculous large sizee
+
+#theme(text = element_text(size=40),
+#      legend.key.height = unit(4, 'cm'),
+#      legend.key.width  = unit(1.75, 'cm'))
 
