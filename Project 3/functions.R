@@ -30,13 +30,13 @@ plotAreaCol = function(fName, width, height, estVal, geoMap, leg, colLim = NULL)
   map = ggplot() +
     geom_polygon(data = nigeria.df,
                  aes(x = Longitude, y = Latitude, group = group, fill = MCV1),
-                 color = 'gray', size = .2)+
+                 color = 'lightgrey', size = .005)+
     scale_fill_viridis_c(direction = 1,
                          begin = 1,
                          end = 0,
                          limit = colLim,
                          name = leg) + 
-    coord_fixed() 
+    coord_fixed() + theme_classic()
   ggsave(filename = fName,
          plot = map,
          width = width, 
