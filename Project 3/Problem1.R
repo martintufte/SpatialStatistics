@@ -37,12 +37,12 @@ table1 <- read.table("data/Admin1Graph.txt", header=TRUE, sep=" ")
 table2 <- read.table("data/Admin2Graph.txt", header=TRUE, sep=" ")
 
 # neighborhood matrices
-M1 <- as.matrix(table1[,-1])
-M2 <- as.matrix(table2[,-1])
+N1 <- as.matrix(table1[,-1])
+N2 <- as.matrix(table2[,-1])
 
 # precision matrices
-Q1 <- diag(rowSums(M1)) - M1
-Q2 <- diag(rowSums(M2)) - M2
+Q1 <- diag(rowSums(N1)) - N1
+Q2 <- diag(rowSums(N2)) - N2
 
 # find ranks
 rankMatrix(Q1)
@@ -50,24 +50,39 @@ rankMatrix(Q2)
 
 # sparsity
 print(paste("Matrix Q1 has sparsity", round(100*sum(Q1 == 0)/length(Q1), 2), "%." ))
-print(paste("Matrix Q1 has sparsity", round(100*sum(Q2 == 0)/length(Q2), 2), "%." ))
+print(paste("Matrix Q2 has sparsity", round(100*sum(Q2 == 0)/length(Q2), 2), "%." ))
 
 
 ## b)
 
 plt.sparsity <- function(Q){
   x <- 1:dim(Q)[1]
-  y <- 1:dim(Q)[2]
+  y <- 1:dim(Q)[2]-1
   
-  Q.flipped <- apply(Q, 1, rev)
-  return(image(x, y, Q.flipped!=0, xaxt='n', ann=FALSE, asp=1, yaxt='n', xlab="Column", ylab="Row", col=c("white", "black")))
+  df <- data.frame(Nonzero = array(Q!=0), coor = expand.grid(x,y))
+  
+  plot <- ggplot(df, aes(x=coor.Var1, y=coor.Var2, fill=Nonzero)) +
+    geom_raster(hjust = 0, vjust = 0) + xlab("Column") + ylab("Row") +
+    scale_fill_manual(values=c("white", "black")) + scale_y_reverse() +
+    coord_fixed() + theme_classic() + theme(legend.position="none")
+  
+  return(plot)
 }
 
-plt.sparsity(Q1)
-plt.sparsity(Q2)
+sparsity1 <- plt.sparsity(Q1)
+sparsity2 <- plt.sparsity(Q2)
 
-install.packages("ggmap")
-library(ggmap)
+ggsave("./figures/sparsityQ1.pdf", plot = sparsity1, width = 5, height = 5)
+ggsave("./figures/sparsityQ2.pdf", plot = sparsity2, width = 5, height = 5)
 
-ggimage(Q1)
-?ggimage
+
+
+
+
+
+
+
+
+
+
+
