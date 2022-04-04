@@ -83,7 +83,6 @@ rGMRF <- function(n, Q, eps = 1e-8){
     v <- solve(L, z)
     return(v - mean(v))
   } else {
-    #V <- matrix(rep(0, nr*n), nrow=nr, ncol=n)
     Z <- matrix(rnorm(nr*n), nrow=nr)
     V <- solve(L, Z)
     return( V - matrix(rep(colMeans(V), nr), nrow=nr, byrow=TRUE) )
@@ -148,16 +147,17 @@ max_var <- ceiling(max(admin2.var))
 plotAreaCol(fName="./figures/admin2_variance.pdf", width=5, height=4, estVal=admin2.var,
             geoMap=nigeriaAdm2, leg="var", colLim = c(0,max_var))
 
-ne <- diag(Q2/tau2)
+# number of neighbors
+ne <- diag(Q2)/tau2
 
 # plot empirical variance with number of neighbors
-median <- rep(0, nrow(Q2))
+median.var <- rep(0, nrow(Q2))
 for (u in unique(ne)){
-  median[ne == u] <- median(admin2.var[ne==u])
+  median.var[ne == u] <- median(admin2.var[ne==u])
 }
 
-ne.var <- ggplot(data.frame(ne=ne, var=admin2.var, median_var=median), aes(x=ne, y=var, group=ne, fill=median)) +
-  geom_boxplot() + labs(x="Neighbors", y="Empirical variance") +
+ne.var <- ggplot(data.frame(ne=ne, var=admin2.var, median_var=median.var), aes(x=ne, y=var, group=ne, fill=median.var)) +
+  geom_boxplot() + labs(x="Number of neighbors", y="Empirical variance") +
   scale_fill_viridis_c(direction=1, begin=1, end=0, limit=c(0,2)) + theme_classic()
 ne.var
 
@@ -166,9 +166,64 @@ ggsave("./figures/admin2_variance_boxplot.pdf", plot = ne.var, width = 5, height
 
 # empirical correlation with Gubio
 cor.Gubio <- function(x) cor(admin2.100[150,], x)
-
 admin2.corr <- sapply(as.data.frame(t(admin2.100)), cor.Gubio)
 
 plotAreaCol(fName="./figures/admin2_correlation_Gubio.pdf", width=5, height=4, estVal=admin2.corr,
-            geoMap=nigeriaAdm2, leg="corr", colLim = c(-1,1))
+            geoMap=nigeriaAdm2, leg="corr", colLim = c(-0.5,1))
+
+
+# Djikstra's algorithm on a neighborhood matrix from a source
+Djikstra <- function(N, source){
+  n = nrow(N)
+  distances <- rep(0,n)
+  visited <- c(source)
+  boundary <- c(source)
+  
+  dist <- 0
+  while(length(boundary)){
+    # add distance to boundary
+    distances[boundary] <- dist
+    # find new boundary
+    if(length(boundary)==1){
+      new.neighbors = which(N[boundary,]!=0)
+    } else {
+      new.neighbors = which(colSums(N[boundary,])!=0)
+    }
+    boundary <- setdiff(new.neighbors, visited)
+    # increment distance
+    dist <- dist+1
+    # update visited vertices
+    visited <- union(visited, boundary)
+  }
+  return(distances)
+}
+
+# test function (should return c(2,0,1,2,3))
+Djikstra(matrix(c(0,0,1,1,1,
+                  0,0,1,0,0,
+                  1,1,0,1,0,
+                  1,0,1,0,0,
+                  1,0,0,0,0), nrow=5), 2)
+
+
+dist.Gubio <- Djikstra(N2, source=150)
+
+
+plotAreaCol(fName="./figures/admin2_distance_Gubio.pdf", width=5, height=4, estVal=dist.Gubio,
+            geoMap=nigeriaAdm2, leg="corr", colLim = c(0,25))
+
+
+median.corr <- rep(0, nrow(Q2))
+for (u in unique(dist.Gubio)){
+  median.corr[dist.Gubio == u] <- median(admin2.corr[dist.Gubio==u])
+}
+
+dist.corr <- ggplot(data.frame(dist.Gubio=dist.Gubio, corr=admin2.corr, median_corr=median.corr),
+                 aes(x=dist.Gubio, y=corr, group=dist.Gubio, fill=median.corr)) +
+  geom_boxplot() + labs(x="Distance to Gubio", y="Empirical correlation") + geom_hline(yintercept = 0, linetype="dashed") +
+  scale_fill_viridis_c(direction=1, begin=1, end=0, limit=c(-0.5,1)) + theme_classic()
+dist.corr
+
+ggsave("./figures/admin2_correlation_boxplot.pdf", plot = dist.corr, width = 5, height = 4)
+
 
