@@ -57,8 +57,8 @@ calcStat <- function(x) {
 
 ## Problem 2 a)
 
-#plotAreaCol(fName = "Project 3/figures/obsProp.pdf", width = 5, height = 4, estVal = obsProportions, 
-#            geoMap = nigeriaAdm1, leg = expression(~~hat(p)), colLim = c(0,1))
+plotAreaCol(fName = "Project 3/figures/obsProp.pdf", width = 5, height = 4, estVal = obsProportions, 
+            geoMap = nigeriaAdm1, leg = expression(~~hat(p)), colLim = c(0,1))
 
 
 ## Problem 2b)
@@ -67,7 +67,7 @@ calcStat <- function(x) {
 
 sigma2 <- 100^2
 
-Q2 <- Diagonal(x = 1/admin1$StdDev)
+Q2 <- Diagonal(x = 1/admin1$StdDev^2)  # ^2 or not?
 Q1 <- (1/sigma2)*Diagonal(37)
 Q <- Q1+Q2
 mu <-  solve(Q1+Q2,Q2 %*% admin1$Observation) 
@@ -79,10 +79,10 @@ x_pB <- inverseLogit(xB)
 
 statB <- calcStat(x_pB)
 
-#plotAreaCol(fName = "Project 3/figures/medianPost.pdf", width = 5, height = 4, estVal = statB$med, 
-#            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
-#plotAreaCol(fName = "Project 3/figures/cvPost.pdf", width = 5, height = 4, estVal = statB$cv, 
-#            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statB$low_cv,statB$high_cv))
+plotAreaCol(fName = "Project 3/figures/medianPost.pdf", width = 5, height = 4, estVal = statB$med, 
+            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
+plotAreaCol(fName = "Project 3/figures/cvPost.pdf", width = 5, height = 4, estVal = statB$cv, 
+            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statB$low_cv,statB$high_cv))
 
 ## Problem 2c)
 
@@ -97,10 +97,10 @@ x_pC <- inverseLogit(xC)
 
 statC <- calcStat(x_pC)
 
-#plotAreaCol(fName = paste("Project 3/figures/medianPostC", tau, ".pdf", sep=""), width = 5, height = 4, estVal = statC$med, 
-#            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
-#plotAreaCol(fName = paste("Project 3/figures/cvPostC", tau, ".pdf", sep=""), width = 5, height = 4, estVal = statC$cv, 
-#            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statC$low_cv,statC$high_cv))
+plotAreaCol(fName = paste("Project 3/figures/medianPostC", tau, ".pdf", sep=""), width = 5, height = 4, estVal = statC$med, 
+            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
+plotAreaCol(fName = paste("Project 3/figures/cvPostC", tau, ".pdf", sep=""), width = 5, height = 4, estVal = statC$cv, 
+            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statC$low_cv,statC$high_cv))
 
 }
 
@@ -118,7 +118,7 @@ M[1:37,1:37] <- diag(37)
 M[38,ind_Kaduna] = 1
 M <- Matrix(M, sparse=TRUE)
 
-Q2D <- Diagonal(x = 1/c(admin1$StdDev,0.1^2))
+Q2D <- Diagonal(x = 1/c(admin1$StdDev^2,0.1^2))
 paramsD <- getParam(Q_besag,Q2D,M,c(admin1$Observation,y_38))
 
 xD <- sampleGMRF(paramsD$mu,paramsD$Q, 100)
@@ -126,11 +126,35 @@ x_pD <- inverseLogit(xD)
 
 statD <- calcStat(x_pD)
 
-#plotAreaCol(fName = "Project 3/figures/medianPostD.pdf", width = 5, height = 4, estVal = statD$med, 
-#            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
-#plotAreaCol(fName = "Project 3/figures/cvPostD.pdf", width = 5, height = 4, estVal = statD$cv, 
-#            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statD$low_cv,statD$high_cv))
+plotAreaCol(fName = "Project 3/figures/medianPostD.pdf", width = 5, height = 4, estVal = statD$med, 
+            geoMap = nigeriaAdm1, leg = "Median", colLim = c(0,1))
+plotAreaCol(fName = "Project 3/figures/cvPostD.pdf", width = 5, height = 4, estVal = statD$cv, 
+            geoMap = nigeriaAdm1, leg = "CV", colLim = c(statD$low_cv,statD$high_cv))
 
 # Compare changes in neighbours
-statC$med[c(5,18,19,21)]
-statD$med[c(5,18,19,21)]
+#statC$med[c(5,18,19,21)]
+#statD$med[c(5,18,19,21)]
+
+## Problem 2 f)
+
+
+loglike <- function(tau) {
+    paramf <- getParam(tau*Q_besag,Q2,diag(37),admin1$Observation)
+    x <- rep(100, 37)
+    -(((37-1)/2)*log(tau) -(tau/2)*t(x)%*%Q_besag%*%x -(1/2)*t(admin1$Observation -x)%*%Q2%*%(admin1$Observation -x)-
+        (1/2)*log(det(paramf$Q))+(1/2)*t(x-paramf$mu)%*%paramf$Q%*%(x-paramf$mu))[1,1]
+}
+
+loglike2 <- function(tau) {
+    paramf <- getParam(tau*Q_besag,Q2,diag(37),admin1$Observation)
+
+    -(((37-1)/2)*log(tau) -(1/2)*t(admin1$Observation)%*%Q2%*%(admin1$Observation)-
+            (1/2)*log(det(paramf$Q))+(1/2)*t(-paramf$mu)%*%paramf$Q%*%(-paramf$mu))[1,1]
+}
+
+tau_est <- optimize(loglike2,c(0.001,550)) 
+tau_est
+
+samp2C(tau_est$minimum)
+
+
